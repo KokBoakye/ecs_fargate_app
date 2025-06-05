@@ -1,0 +1,37 @@
+name: Deploy Static HTML to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to EC2
+      run: |
+        ssh ubuntu@${{ secrets.EC2_HOST }} <<EOF
+          docker stop my-html-site || true
+          docker rm my-html-site || true
+          rm -rf ~/html-site || true
+          mkdir ~/html-site
+        EOF
+
+        scp -r * ubuntu@${{ secrets.EC2_HOST }}:~/html-site
+
+        ssh ubuntu@${{ secrets.EC2_HOST }} <<EOF
+          cd ~/html-site
+          docker build -t my-html-site .
+          docker run -d -p 80:80 --name my-html-site my-html-site
+        EOF
