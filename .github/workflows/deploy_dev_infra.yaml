@@ -51,7 +51,7 @@ jobs:
 
             - name: Terraform Format & Validate
               run: |
-                 terraform -chdir=infra format
+                 terraform -chdir=infra fmt
                  terraform -chdir=infra validate
 
             - name: Terraform Plan
