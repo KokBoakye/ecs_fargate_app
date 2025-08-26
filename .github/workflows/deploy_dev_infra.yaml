@@ -47,13 +47,9 @@ jobs:
                       --create-bucket-configuration LocationConstraint=eu-north-1
 
             - name: Terraform Init
-              run: |
-                 terraform -chdir=infra init -backend-config="bucket=terraform-state-bucket-app-25-08-2025" \
-                  -backend-config="key=aws-terraform-states/terraform.tfstate" \
-                  -backend-config="region=eu-north-1"
-
-                  terraform force-unlock 6bf207da-d44f-8d64-82e9-58792458bcdb
- 
+              run: terraform -chdir=infra init 
+                 
+                  
 
             - name: Terraform Format & Validate
               run: |
