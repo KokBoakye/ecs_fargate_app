@@ -63,7 +63,7 @@ jobs:
               if: ${{ github.event.inputs.action == 'destroy' }}
               run: terraform -chdir=infra destroy --auto-approve -var-file=envs/dev.tfvars
 
-            - name: Terraform Apply
+            - name: Terraform  Apply
               if: ${{ github.event.inputs.action == 'apply' }}
               run: terraform -chdir=infra apply --auto-approve -var-file=envs/dev.tfvars
 
