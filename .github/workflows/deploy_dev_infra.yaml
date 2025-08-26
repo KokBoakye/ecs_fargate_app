@@ -1,0 +1,71 @@
+name: Deploy Infra
+
+on:
+    push:
+        branches:
+            - dev
+
+    workflow_dispatch:
+        inputs:
+            action:
+                description: 'Select action to perform'
+                required: true
+                default: 'apply'
+                type: choice
+                options:
+                    - apply
+                    - destroy
+
+jobs: 
+    terraform:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+
+            - name: Set up Terraforrm
+              uses: hashicorp/setup-terraform@v2
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                role-to-assume: arn:aws:iam::604312263409:role/githubuser
+                aws-region: eu-north-1
+
+            - name: Create s3 bucket for backend
+              run: |
+                 aws s3api head-bucket --bucket terraform-state-bucket-app-25-08-2025 2>/dev/null || \
+                  aws s3api create-bucket \
+                      --bucket terraform-state-bucket-app-25-08-2025 \
+                      --region eu-north-1 \
+                      --create-bucket-configuration LocationConstraint=eu-north-1
+
+            - name: Terraform Init
+              run: terraform -chdir=infra init 
+
+            - name: Terraform Format & Validate
+              run: |
+                 terraform -chdir=infra format
+                 terraform -chdir=infra validate
+
+            - name: Terraform Plan
+              run: |
+                export TF_LOG=DEBUG
+                terraform -chdir=infra plan -var-file=envs/dev.tfvars
+
+            - name: Terraform Destroy
+              if: ${{ github.event.inputs.action == 'destroy' }}
+              run: terraform -chdir=infra destroy -var-file=envs/dev.tfvars
+
+            - name: Terraform Apply
+              if: ${{ github.event.inputs.action == 'apply' }}
+              run: terraform -chdir=infra apply -var-file=envs/dev.tfvars
+
+            - name: Terraform Total Output
+              run: terraform -chdir=infra state list
