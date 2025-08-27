@@ -1,6 +1,6 @@
 
 
-app_name = "myflask"
+app_name = "todo"
 
 environment = "dev"
 
