@@ -35,7 +35,7 @@ jobs:
               run: |
                 docker buildx build \                                                
                 --platform linux/amd64 \
-                -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/selase:latest \ ./app
+                -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/selase:latest \ ./application
 
             - name: Push image to ECR
               run: docker push 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask
