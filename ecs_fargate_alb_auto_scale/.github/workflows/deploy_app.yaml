@@ -1,4 +1,4 @@
-name: Deploy  App
+name: Deploy App
 
 on:
     push:
@@ -33,17 +33,9 @@ jobs:
 
             - name: Build image
               run: |
-
                 docker buildx build \                                                
                 --platform linux/amd64 \
-                -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest \ ./application
-
-                docker buildx build \
-                  --platform linux/amd64 \
-                  -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest \
-                  ./app
-
+                -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/selase:latest \ ./app
 
             - name: Push image to ECR
-              run: |
-                docker push 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest
+              run: docker push 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask
