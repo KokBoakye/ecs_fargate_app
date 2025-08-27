@@ -48,11 +48,14 @@ jobs:
 
             - name: Terraform Init
               run: terraform -chdir=infra init 
+                 
+                  
 
             - name: Terraform Format & Validate
               run: |
                  terraform -chdir=infra fmt
                  terraform -chdir=infra validate
+                 
 
             - name: Terraform Plan
               run: |
@@ -61,11 +64,11 @@ jobs:
 
             - name: Terraform Destroy
               if: ${{ github.event.inputs.action == 'destroy' }}
-              run: terraform -chdir=infra destroy -var-file=envs/dev.tfvars
+              run: terraform -chdir=infra destroy --auto-approve -var-file=envs/dev.tfvars
 
-            - name: Terraform Apply
+            - name: Terraform  Apply
               if: ${{ github.event.inputs.action == 'apply' }}
-              run: terraform -chdir=infra apply -var-file=envs/dev.tfvars
+              run: terraform -chdir=infra apply --auto-approve -var-file=envs/dev.tfvars
 
             - name: Terraform Total Output
               run: terraform -chdir=infra state list
