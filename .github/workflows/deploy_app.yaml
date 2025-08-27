@@ -33,16 +33,10 @@ jobs:
 
             - name: Build image
               run: |
-<<<<<<< HEAD
-                docker buildx build \
-                  --platform linux/amd64 \
-                  -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest \
-                  ./app
-=======
                 docker buildx build \                                                
                 --platform linux/amd64 \
                 -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest \ ./application
->>>>>>> dev
+
 
             - name: Push image to ECR
               run: |
