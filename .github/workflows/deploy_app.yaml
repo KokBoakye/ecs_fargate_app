@@ -1,44 +1,40 @@
-name: Deploy  App
+name: Deploy App
 
 on:
-    push:
-        branches:
-            - app
+  push:
+    branches:
+      - app
 
 jobs:
-    Docker-build-push:
-        runs-on: ubuntu-latest
+  Docker-build-push:
+    runs-on: ubuntu-latest
 
-        permissions:
-            contents: read
-            id-token: write
+    permissions:
+      contents: read
+      id-token: write
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::604312263409:role/githubuser
+          aws-region: eu-north-1
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                role-to-assume: arn:aws:iam::604312263409:role/githubuser
-                aws-region: eu-north-1
+      - name: Authenticate to Amazon ECR
+        run: |
+          aws ecr get-login-password --region eu-north-1 \
+          | docker login --username AWS --password-stdin 604312263409.dkr.ecr.eu-north-1.amazonaws.com
 
-            - name: Authenticate to Amazon ECR
-              run: |
-                 aws ecr get-login-password --region eu-north-1 \
-                  | docker login --username AWS --password-stdin 604312263409.dkr.ecr.eu-north-1.amazonaws.com
+      - name: Build image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest \
+            ./application
 
-            
-
-            - name: Build image
-              run: |
-                docker buildx build \                                                
-                --platform linux/amd64 \
-                -t 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest \ 
-                ./application
-
-
-            - name: Push image to ECR
-              run: |
-                docker push 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest
+      - name: Push image to ECR
+        run: |
+          docker push 604312263409.dkr.ecr.eu-north-1.amazonaws.com/myflask:latest
