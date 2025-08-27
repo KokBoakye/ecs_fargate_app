@@ -3,9 +3,14 @@ import os
 
 app = Flask(__name__)
 
-# In-memory task store (for simplicity)
+# In-memory task store
 tasks = {}
 task_id_counter = 1
+
+# Root route
+@app.route("/")
+def index():
+    return "Flask app is running!", 200
 
 # Health check
 @app.route("/health", methods=["GET"])
