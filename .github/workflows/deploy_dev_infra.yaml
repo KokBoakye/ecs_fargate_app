@@ -24,6 +24,10 @@ jobs:
             contents: read
             id-token: write
 
+        defaults:
+            run:
+                working-directory: terraform
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@v3
@@ -47,28 +51,28 @@ jobs:
                       --create-bucket-configuration LocationConstraint=eu-north-1
 
             - name: Terraform Init
-              run: terraform -chdir=terraform init 
+              run: terraform init 
                  
                   
 
             - name: Terraform Format & Validate
               run: |
-                 terraform -chdir=terraform fmt
-                 terraform -chdir=terraform validate
+                 terraform fmt
+                 terraform validate
                  
 
             - name: Terraform Plan
               run: |
                 export TF_LOG=DEBUG
-                terraform -chdir=terraform plan -var-file=envs/dev.tfvars
+                terraform plan -var-file=envs/dev.tfvars
 
             - name: Terraform Destroy
               if: ${{ github.event.inputs.action == 'destroy' }}
-              run: terraform -chdir=terraform destroy --auto-approve -var-file=envs/dev.tfvars
+              run: terraform destroy --auto-approve -var-file=envs/dev.tfvars
 
             - name: Terraform  Apply
               if: ${{ github.event.inputs.action == 'apply' }}
-              run: terraform -chdir=terraform apply --auto-approve -var-file=envs/dev.tfvars
+              run: terraform apply --auto-approve -var-file=envs/dev.tfvars
 
             - name: Terraform Total Output
-              run: terraform -chdir=terraform state list
+              run: terraform state list
